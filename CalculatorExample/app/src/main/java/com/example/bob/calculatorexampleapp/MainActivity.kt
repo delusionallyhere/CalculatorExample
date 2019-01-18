@@ -2,8 +2,10 @@ package com.example.bob.calculatorexampleapp
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
+import net.objecthunter.exp4j.ExpressionBuilder
 
 class MainActivity : AppCompatActivity() {
 
@@ -11,6 +13,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Numbers
         tvOne.setOnClickListener { appendOnExpression ( string: "1", canClear: true )}
         tvTwo.setOnClickListener { appendOnExpression ( string: "2", canClear: true )}
         tvThree.setOnClickListener { appendOnExpression ( string: "3", canClear: true )}
@@ -23,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         tvZero.setOnClickListener { appendOnExpression ( string: "0", canClear: true )}
         tvDot.setOnClickListener { appendOnExpression ( string: ".", canClear: true )}
 
+        // Operators
         tvPlus.setOnClickListener { appendOnExpression ( string: "+", canClear: false )}
         tvMinus.setOnClickListener { appendOnExpression ( string: "-", canClear: false )}
         tvMul.setOnClickListener { appendOnExpression ( string: "*", canClear: false )}
@@ -42,9 +46,27 @@ class MainActivity : AppCompatActivity() {
             }
             tvResult.text = ""
         }
+
+        tvEquals.setOnClickListener(
+            try {
+                val expression = ExpressionBuilder(tvExpression.text.toString()).build()
+                val result = expression.evaluate()
+                val longResult = result.toLong()
+
+                if (result == longResult.toDouble())
+                    tvResult.text = longResult.toString()
+                else
+                    tvResult.text = result.toString()
+            } catch (e:Exception) {
+                Log.d("Exception", " message : " + e.message )
+            } as View.OnClickListener?
+        )
     }
 
-    fun appendOnExpression( string: String, canClear : Boolean) {
+    private fun appendOnExpression( string: String, canClear : Boolean) {
+            if (tvResult.text.isNotEmpty()) {
+                tvExpression.text = ""
+            }
             if(canClear) {
                 tvResult.text = ""
                 tvExpression.append(string)
